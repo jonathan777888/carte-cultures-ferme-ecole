@@ -1,4 +1,4 @@
-# Rotation culturale 2027 — preuve technique (projet RPL)
+# Rotation culturale 2027 — documentation technique
 
 ## Objectif
 
@@ -28,7 +28,7 @@ L'heuristique est déterministe et non globale : elle **n'optimise pas** le rend
 
 Pour `P` planches et `C` cultures candidates, le filtrage et le classement des candidates prennent au plus `O(P × C log C)` dans cette version (la cartographie des familles et les compteurs sont à accès moyen constant). L'espace supplémentaire est `O(P + C)` hors stockage des données d'entrée.
 
-Cette analyse décrit l'algorithme et ne constitue pas un benchmark de performance ni une preuve d'équivalence accordée par MTU.
+Cette analyse théorique ne remplace pas une mesure de performance de l'application.
 
 ## Qualité, provenance et validation
 
@@ -47,7 +47,7 @@ npm run test:rotations
 npm run build
 ```
 
-Les modules d'algorithmique et de développement logiciel du programme MTU peuvent examiner ce code comme **un exemple de travail pratique** : types, classifications, invariants, algorithmes, contrôles de validité, tests et documentation. Le jury RPL doit décider de la suffisance des preuves et de l'authenticité des compétences démontrées par le candidat.
+L'implémentation est documentée pour faciliter sa maintenance : types, classifications, invariants, algorithmes, contrôles de validité et tests.
 
 ## Éléments à approfondir
 
