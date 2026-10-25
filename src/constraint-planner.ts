@@ -5,7 +5,7 @@ import {
   type Famille,
   type PlancheHistorique,
   type PropositionRotation,
-} from "./rotation-engine";
+} from "./rotation-engine.ts";
 
 /**
  * Probleme de satisfaction de contraintes (CSP) : les sommets sont les planches,
