@@ -29,3 +29,11 @@
 .rotation-limit { margin: 18px 0 0; padding: 14px; border-left: 4px solid #c99e45; background: #fff6df; border-radius: 8px; color: #574a35; font-size: 12px; line-height: 1.65; }
 @media (max-width: 860px) { .rotation-line { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } .rotation-diagnostic { grid-column: 1 / -1; } }
 @media (max-width: 520px) { .rotation-panel { padding: 15px; border-radius: 15px; } .rotation-line { grid-template-columns: 1fr; } .rotation-diagnostic { grid-column: auto; } .rotation-actions { width: 100%; } .rotation-actions button { flex: 1; } }
+
+.rotation-lab { margin: 20px 0; padding: 18px; border: 1px solid #bad2cc; border-radius: 14px; background: #edf7f5; }
+.rotation-lab h3 { margin: 0 0 8px; color: #174c40; }
+.rotation-lab p { font-size: 13px; line-height: 1.55; }
+.rotation-lab-fields { display: flex; flex-wrap: wrap; gap: 16px; margin: 12px 0; }
+.rotation-lab-fields label { display: grid; gap: 5px; flex: 1 1 155px; font-size: 13px; font-weight: 700; }
+.rotation-lab-fields input { border: 1px solid #b0c7bc; border-radius: 8px; padding: 9px; min-width: 0; }
+.rotation-lab small { display: block; margin-top: 9px; color: #52685f; }
