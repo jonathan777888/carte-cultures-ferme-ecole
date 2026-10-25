@@ -6,6 +6,8 @@ import {
   type PlancheHistorique,
   type EtatRotation,
 } from "./rotation-engine";
+import { optimiserRotations } from "./constraint-planner";
+import { DEMO_SYNTHETIQUE, separerDonnees, entrainerRegression, evaluerRegression } from "./agri-statistics";
 import "./rotation-panel.css";
 
 type Props = {
@@ -65,6 +67,27 @@ export default function RotationPanel({ plotId, planches, nomsCultures }: Props)
     }));
   }
 
+  const [diagnosticAlgo, setDiagnosticAlgo] = useState("");
+  function optimiser() {
+    const resultat = optimiserRotations(planches);
+    if (!resultat.propositions.length) {
+      setDiagnosticAlgo("Aucun scénario trouvé avec les contraintes définies.");
+      return;
+    }
+    setChoix((etat) => ({
+      ...etat,
+      ...Object.fromEntries(resultat.propositions.map(p => [`${plotId}-P${p.number}`, p.crop])),
+    }));
+    setDiagnosticAlgo(`Recherche sous contraintes : ${resultat.noeuds} nœuds explorés, ${resultat.branchesCoupees} branches écartées. ${resultat.optimaleProuvee ? "Score mathématique optimal pour les critères choisis." : "Optimalité non prouvée (limite de recherche atteinte)."}`);
+  }
+  const [eau, setEau] = useState(18);
+  const [temperature, setTemperature] = useState(22);
+  const modele = (() => {
+    const { entrainement, test } = separerDonnees(DEMO_SYNTHETIQUE);
+    const m = entrainerRegression(entrainement);
+    return { prediction: m.predire(eau, temperature), metrics: evaluerRegression(test, m.predire) };
+  })();
+
   function reinitialiser() {
     setChoix((etat) => {
       const suivant = { ...etat };
@@ -107,10 +130,12 @@ export default function RotationPanel({ plotId, planches, nomsCultures }: Props)
         </div>
         <div className="rotation-actions">
           <button type="button" onClick={generer}>Proposer un scénario</button>
+          <button type="button" onClick={optimiser}>Optimiser sous contraintes</button>
           <button type="button" className="secondary" onClick={reinitialiser}>Effacer ce scénario</button>
           <button type="button" className="secondary" onClick={exporter}>Exporter en JSON</button>
         </div>
       </header>
+      {diagnosticAlgo && <p className="rotation-limit" aria-live="polite">{diagnosticAlgo}</p>}
       <div className="rotation-summary" aria-live="polite">
         <span><strong>{sansRepetition}</strong> sans répétition directe</span>
         <span><strong>{conflits}</strong> conflit(s) détecté(s)</span>
@@ -142,6 +167,17 @@ export default function RotationPanel({ plotId, planches, nomsCultures }: Props)
           </div>
         ))}
       </div>
+      <section className="rotation-lab" aria-label="Laboratoire de statistiques et apprentissage">
+        <h3>Laboratoire de données — simulation pédagogique</h3>
+        <p>Régression Ridge entraînée sur un jeu de données <strong>synthétiques</strong> (36 observations d'entraînement et 12 de test). Ce résultat n'est pas une prévision agronomique utilisable au champ.</p>
+        <div className="rotation-lab-fields">
+          <label>Eau fictive (mm) <input type="number" min="0" max="200" value={eau} onChange={e => setEau(Number(e.target.value))} /></label>
+          <label>Température fictive (°C) <input type="number" min="-10" max="55" value={temperature} onChange={e => setTemperature(Number(e.target.value))} /></label>
+        </div>
+        <strong>Rendement estimé sur données simulées : {modele.prediction.toFixed(2)} unités fictives</strong>
+        <p>Erreur absolue moyenne sur le jeu de test : {modele.metrics.mae.toFixed(3)} · RMSE : {modele.metrics.rmse.toFixed(3)}</p>
+        <small>Les paramètres de ce modèle ne doivent pas servir à piloter une irrigation ou à promettre un rendement réel.</small>
+      </section>
       <p className="rotation-limit">
         <strong>Limites :</strong> la comparaison ne porte que sur la répétition immédiate de familles botaniques.
         Les mélanges d'engrais verts, les cultures successives non renseignées, les précédents plus anciens,
