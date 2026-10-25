@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import RotationPanel from "./RotationPanel";
 
 type ZoneId = "petit" | "moyen" | "grand" | "tunnel";
 type ViewId = "carte" | "parcelles" | "travaux";
@@ -2147,6 +2148,13 @@ export default function Home() {
                 )}
               </aside>
             </div>
+            {activeZone === "moyen" && selectedPlot.parcels && (
+              <RotationPanel
+                plotId={selectedPlot.id}
+                planches={selectedPlot.parcels}
+                nomsCultures={cropMeta}
+              />
+            )}
           </section>
         ) : (
           <section className="work-assistant">
