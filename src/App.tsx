@@ -1,10 +1,10 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import RotationPanel from "./RotationPanel";
 
 type ZoneId = "petit" | "moyen" | "grand" | "tunnel";
-type ViewId = "carte" | "parcelles" | "travaux";
+type ViewId = "carte" | "parcelles" | "rotations" | "travaux";
 type WorkGuideId =
   | "decision"
   | "machines"
@@ -1311,7 +1311,12 @@ function Icon({
 }
 
 export default function Home() {
-  const [activeView, setActiveView] = useState<ViewId>("carte");
+  const [activeView, setActiveView] = useState<ViewId>(() =>
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("vue") === "rotations"
+      ? "rotations"
+      : "carte",
+  );
   const [activeWorkGuide, setActiveWorkGuide] =
     useState<WorkGuideId>("decision");
   const [activeZone, setActiveZone] = useState<ZoneId>("moyen");
@@ -1331,6 +1336,27 @@ export default function Home() {
     plots.find((plot) => plot.zone === activeZone)!;
 
   const zonePlots = plots.filter((plot) => plot.zone === activeZone);
+  const rotationPlot =
+    mediumBlocks.find((plot) => plot.id === selectedPlotId) ??
+    mediumBlocks.find((plot) => plot.id === "A1")!;
+
+  // Permet de partager un lien direct vers le simulateur et de conserver la
+  // page après actualisation, sans modifier les données du registre.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (activeView === "rotations") url.searchParams.set("vue", "rotations");
+    else url.searchParams.delete("vue");
+    window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+  }, [activeView]);
+
+  function openRotations() {
+    setActiveZone("moyen");
+    if (!mediumBlocks.some((plot) => plot.id === selectedPlotId)) {
+      setSelectedPlotId("A1");
+    }
+    setActiveView("rotations");
+  }
 
   const searchResults = useMemo(() => {
     const normalized = submittedQuery.trim().toLocaleLowerCase("fr");
@@ -1504,9 +1530,14 @@ export default function Home() {
             <Icon name="map" />
             <span>Carte</span>
           </button>
-          <button className="rail-item" type="button">
+          <button
+            className={`rail-item ${activeView === "rotations" ? "is-active" : ""}`}
+            onClick={openRotations}
+            type="button"
+            aria-label="Ouvrir les rotations culturales 2027"
+          >
             <Icon name="leaf" />
-            <span>Cultures</span>
+            <span>Rotations 2027</span>
           </button>
           <button
             className={`rail-item ${activeView === "parcelles" ? "is-active" : ""}`}
@@ -1551,7 +1582,9 @@ export default function Home() {
                 ? "Carte des cultures"
                 : activeView === "parcelles"
                   ? "Parcelles et planches"
-                  : "Travaux à faire"}
+                  : activeView === "rotations"
+                    ? "Rotations 2027"
+                    : "Travaux à faire"}
             </h1>
           </div>
           <div className="top-actions">
@@ -1564,6 +1597,19 @@ export default function Home() {
             </span>
           </div>
         </header>
+
+        {activeView === "carte" && (
+          <section className="rotation-discovery" aria-label="Planification culturale 2027">
+            <div>
+              <p className="eyebrow">Planification 2027</p>
+              <h2>Simuler les rotations de tes parcelles</h2>
+              <p>Choisis une parcelle du Moyen Jardin, compare les familles botaniques et teste un scénario pour les dix planches.</p>
+            </div>
+            <button type="button" onClick={openRotations}>
+              Ouvrir les rotations 2027 <span aria-hidden="true">→</span>
+            </button>
+          </section>
+        )}
 
         {activeView === "carte" ? (
         <>
@@ -2041,6 +2087,9 @@ export default function Home() {
                   ou plusieurs rangs selon la culture.
                 </p>
               </div>
+              <button className="rotation-shortcut" type="button" onClick={openRotations}>
+                Ouvrir les rotations 2027 <span aria-hidden="true">→</span>
+              </button>
               <div className="parcel-structure" aria-label="Structure d’une parcelle">
                 <b>Parcelle C2</b><span>→</span><b>10 planches</b>
                 <span>→</span><b>Culture et rangs</b>
@@ -2155,6 +2204,39 @@ export default function Home() {
                 nomsCultures={cropMeta}
               />
             )}
+          </section>
+        ) : activeView === "rotations" ? (
+          <section className="rotations-view">
+            <div className="rotations-view-intro">
+              <div>
+                <p className="eyebrow">Moyen Jardin · Planification culturale</p>
+                <h2>Rotations des planches en 2027</h2>
+                <p>Les scénarios proposés sont séparés du registre de 2026. Ils doivent être vérifiés avant toute décision au champ.</p>
+              </div>
+              <label className="rotations-view-select" htmlFor="rotation-parcelle">
+                <span>Parcelle à étudier</span>
+                <select
+                  id="rotation-parcelle"
+                  value={rotationPlot.id}
+                  onChange={(event) => {
+                    setActiveZone("moyen");
+                    setSelectedPlotId(event.target.value);
+                  }}
+                >
+                  {mediumBlocks.map((plot) => (
+                    <option key={plot.id} value={plot.id}>
+                      {plot.id} — {plot.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <RotationPanel
+              key={rotationPlot.id}
+              plotId={rotationPlot.id}
+              planches={rotationPlot.parcels ?? []}
+              nomsCultures={cropMeta}
+            />
           </section>
         ) : (
           <section className="work-assistant">
