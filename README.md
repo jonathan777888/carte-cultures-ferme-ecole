@@ -24,7 +24,7 @@ Dans l'onglet **Parcelles**, choisir **Moyen Jardin**, puis une parcelle (A1 à 
 
 **Attention :** l'outil ne remplace pas le plan agronomique. Historique pluriannuel, mélanges d'engrais verts, sols, maladies et débouchés restent à valider.
 
-Lire [la documentation technique des rotations](docs/rotation-2027-rpl.md).
+Lire [la documentation technique des rotations](docs/rotations-2027.md).
 
 Lancer les tests :
 
