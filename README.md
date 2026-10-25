@@ -12,6 +12,26 @@ Version publique de l’application de repérage des cultures de la ferme-école
 
 Les données marquées **à confirmer** ne doivent pas être considérées comme définitives.
 
+## Simulation des rotations 2027 (en cours de validation)
+
+Dans l'onglet **Parcelles**, choisir **Moyen Jardin**, puis une parcelle (A1 à D6). Sous les planches, le simulateur permet de :
+
+- comparer les cultures 2026 à un **scénario 2027** pour chacune des dix planches ;
+- détecter les répétitions immédiates de familles botaniques connues ;
+- signaler explicitement les historiques ou les familles non confirmés ;
+- générer une proposition déterministe, la modifier manuellement et l'exporter au format JSON ;
+- enregistrer ce scénario séparément dans le navigateur, **sans modifier le registre 2026**.
+
+**Attention :** l'outil ne remplace pas le plan agronomique. Historique pluriannuel, mélanges d'engrais verts, sols, maladies et débouchés restent à valider.
+
+Lire [la documentation technique et pédagogique RPL](docs/rotation-2027-rpl.md).
+
+Lancer les tests :
+
+```bash
+npm run test:rotations
+```
+
 ## Développement local
 
 ```bash
