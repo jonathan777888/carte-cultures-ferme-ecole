@@ -5,7 +5,8 @@ on:
     branches: [main]
     paths:
       - "src/**"
-      - "tests/rotation-engine.test.mjs"
+      - "tests/**"
+      - "labs/**"
       - "package.json"
       - "package-lock.json"
   workflow_dispatch:
@@ -30,7 +31,12 @@ jobs:
         run: npm ci
 
       - name: Tester les règles de rotation
-        run: npm run test:rotations
+        run: npm run test:advanced
+
+      - name: Compiler et verifier la simulation C11
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror -pedantic labs/c-systemes/capteur.c -lm -o /tmp/capteur-test
+          /tmp/capteur-test
 
       - name: Vérifier la compilation TypeScript et Vite
         run: npm run build
