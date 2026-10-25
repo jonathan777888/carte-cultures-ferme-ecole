@@ -2026,53 +2026,17 @@ export default function Home() {
             <h2>Légende des cultures</h2>
           </div>
           <div className="legend-list">
-            {(
-              [
-                "laitue",
-                "pomme-de-terre",
-                "tomate",
-                "aubergine",
-                "poivron",
-                "patate-douce",
-                "basilic",
-                "celeri",
-                "melon",
-                "sarrasin",
-                "mais",
-                "soya",
-                "courge",
-                "kale",
-                "carotte",
-                "panais",
-                "courgette",
-                "engrais-vert",
-                "eucalyptus",
-                "betterave",
-                "oignon",
-                "ail",
-                "chou",
-                "brocoli",
-                "celeri-rave",
-                "rutabaga",
-                "fraise",
-                "fines-herbes",
-                "legumineuse",
-                "fleur",
-                "concombre",
-                "cerise-terre",
-                "tournesol",
-                "chou-rave",
-                "vide",
-              ] as CropId[]
-            ).map((cropId) => (
-              <span key={cropId}>
-                <i
-                  aria-hidden="true"
-                  style={{ backgroundColor: cropMeta[cropId].color }}
-                />
-                {cropMeta[cropId].icon} {cropMeta[cropId].name}
-              </span>
-            ))}
+            {Object.entries(cropMeta)
+              .filter(([cropId]) => cropId !== "inconnu")
+              .map(([cropId, meta]) => (
+                <span key={cropId}>
+                  <i
+                    aria-hidden="true"
+                    style={{ backgroundColor: meta.color }}
+                  />
+                  {meta.icon} {meta.name}
+                </span>
+              ))}
           </div>
         </section>
         </>
